@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import MenuCard from "@/components/MenuCard";
+import CartDrawer from "@/components/CartDrawer";
+import CheckoutForm from "@/components/CheckoutForm";
 
 export default function ShopMenuPage() {
   const params = useParams();
+  const router = useRouter();
   const slug = params.slug;
 
   const [shop, setShop] = useState(null);
@@ -15,13 +18,14 @@ export default function ShopMenuPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ตะกร้า: { menuItemId: quantity }
+  // ตะกร้า
   const [cart, setCart] = useState({});
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   useEffect(() => {
     async function fetchShopData() {
       try {
-        // 1. ดึงข้อมูลร้านจาก slug
         const { data: shopData, error: shopError } = await supabase
           .from("shops")
           .select("*")
@@ -37,7 +41,6 @@ export default function ShopMenuPage() {
 
         setShop(shopData);
 
-        // 2. ดึงหมวดหมู่เมนู
         const { data: catData } = await supabase
           .from("menu_categories")
           .select("*")
@@ -46,7 +49,6 @@ export default function ShopMenuPage() {
 
         setCategories(catData || []);
 
-        // 3. ดึงเมนูอาหาร
         const { data: itemData } = await supabase
           .from("menu_items")
           .select("*")
@@ -65,7 +67,7 @@ export default function ShopMenuPage() {
     if (slug) fetchShopData();
   }, [slug]);
 
-  // ฟังก์ชันจัดการตะกร้า
+  // ฟังก์ชันตะกร้า
   const addToCart = (itemId) => {
     setCart((prev) => ({
       ...prev,
@@ -92,7 +94,14 @@ export default function ShopMenuPage() {
     return sum + (item ? item.price * qty : 0);
   }, 0);
 
-  // --- Loading State ---
+  // เมื่อสั่งสำเร็จ → ไปหน้าติดตามสถานะ
+  const handleOrderSuccess = (orderId) => {
+    setIsCheckoutOpen(false);
+    setCart({});
+    router.push(`/shop/${slug}/order/${orderId}`);
+  };
+
+  // --- Loading ---
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-orange-50/50">
@@ -104,7 +113,7 @@ export default function ShopMenuPage() {
     );
   }
 
-  // --- Error State ---
+  // --- Error ---
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-orange-50/50 px-4">
@@ -121,7 +130,8 @@ export default function ShopMenuPage() {
       <div
         className="px-5 pt-8 pb-6 text-center"
         style={{
-          background: "linear-gradient(135deg, #EA580C 0%, #F97316 50%, #F59E0B 100%)",
+          background:
+            "linear-gradient(135deg, #EA580C 0%, #F97316 50%, #F59E0B 100%)",
         }}
       >
         <div className="w-16 h-16 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-lg">
@@ -132,18 +142,19 @@ export default function ShopMenuPage() {
           <p className="text-orange-100 text-sm mt-1">{shop.description}</p>
         )}
         <div className="flex items-center justify-center gap-4 mt-3 text-orange-100 text-xs">
-          <span>🕐 {shop.open_time?.slice(0, 5)} - {shop.close_time?.slice(0, 5)}</span>
+          <span>
+            🕐 {shop.open_time?.slice(0, 5)} - {shop.close_time?.slice(0, 5)}
+          </span>
           {shop.phone && <span>📞 {shop.phone}</span>}
         </div>
       </div>
 
-      {/* ===== เมนูแบ่งตามหมวดหมู่ ===== */}
+      {/* ===== เมนูแบ่งหมวดหมู่ ===== */}
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
         {categories.map((category) => {
           const items = menuItems.filter(
             (item) => item.category_id === category.id
           );
-
           if (items.length === 0) return null;
 
           return (
@@ -166,24 +177,52 @@ export default function ShopMenuPage() {
           );
         })}
 
-        {/* เว้นที่ให้ Cart Bar ไม่บัง */}
         {totalItems > 0 && <div className="h-24" />}
       </div>
 
-      {/* ===== Cart Bar (แสดงเมื่อมีของในตะกร้า) ===== */}
+      {/* ===== Cart Bar ===== */}
       {totalItems > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-orange-100 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-orange-100 shadow-lg z-30">
           <div className="max-w-lg mx-auto">
-            <button className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md shadow-orange-200 transition-colors active:scale-[0.98]">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md shadow-orange-200 transition-colors active:scale-[0.98]"
+            >
               <span>🛒 ดูตะกร้า</span>
               <span className="bg-white text-orange-600 rounded-full px-2.5 py-0.5 text-sm font-black">
                 {totalItems}
               </span>
-              <span className="ml-auto font-black">฿{totalPrice.toLocaleString()}</span>
+              <span className="ml-auto font-black">
+                ฿{totalPrice.toLocaleString()}
+              </span>
             </button>
           </div>
         </div>
       )}
+
+      {/* ===== Cart Drawer ===== */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cart={cart}
+        menuItems={menuItems}
+        onAdd={addToCart}
+        onRemove={removeFromCart}
+        onCheckout={() => {
+          setIsCartOpen(false);
+          setIsCheckoutOpen(true);
+        }}
+      />
+
+      {/* ===== Checkout Form ===== */}
+      <CheckoutForm
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        shop={shop}
+        cart={cart}
+        menuItems={menuItems}
+        onSuccess={handleOrderSuccess}
+      />
     </div>
   );
 }

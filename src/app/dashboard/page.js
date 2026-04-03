@@ -60,7 +60,7 @@ export default function DashboardPage() {
       setLoading(false);
 
       // 4. Realtime — ต้องตั้ง listener ก่อน subscribe
-      channel = supabase.channel("dashboard-orders");
+      channel = supabase.channel(`dashboard-orders-${Date.now()}`);
 
       channel.on(
         "postgres_changes",

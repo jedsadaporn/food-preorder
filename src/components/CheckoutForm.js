@@ -56,7 +56,7 @@ export default function CheckoutForm({
     setLoading(true);
 
     try {
-      // สร้าง pickup_time เป็น timestamp วันนี้ + เวลาที่เลือก
+      // สร้าง pickup_time
       const today = new Date();
       const [h, m] = selectedTime.split(":").map(Number);
       today.setHours(h, m, 0, 0);
@@ -92,6 +92,13 @@ export default function CheckoutForm({
         .insert(orderItems);
 
       if (itemsError) throw itemsError;
+
+      // 3. ส่ง LINE แจ้งเตือนร้านค้า (ไม่ต้องรอผล ส่ง background)
+      fetch("/api/notify-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: order.id }),
+      }).catch((err) => console.error("LINE notify error:", err));
 
       // สำเร็จ!
       onSuccess(order.id);

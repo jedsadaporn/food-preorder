@@ -186,7 +186,7 @@ export default function ShopMenuPage() {
           <div className="max-w-lg mx-auto">
             <button
               onClick={() => setIsCartOpen(true)}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-3 shadow-md shadow-orange-200 transition-colors active:scale-[0.98]"
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3.5 px-5 rounded-xl font-bold flex items-center gap-3 shadow-md shadow-orange-200 transition-colors active:scale-[0.98]"
             >
               <span>🛒 ดูตะกร้า</span>
               <span className="bg-white text-orange-600 rounded-full px-2.5 py-0.5 text-sm font-black">

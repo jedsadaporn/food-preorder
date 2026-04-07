@@ -8,12 +8,12 @@ export default function DashboardNav({ shopName, onLogout }) {
 
   const links = [
     { href: "/dashboard", label: "📋 ออเดอร์", key: "orders" },
-    { href: "/dashboard/menu", label: "🍳 จัดการเมนู", key: "menu" },
+    { href: "/dashboard/menu", label: "🍳 เมนู", key: "menu" },
+    { href: "/dashboard/settings", label: "⚙️ ตั้งค่า", key: "settings" },
   ];
 
   return (
     <div className="bg-gray-900">
-      {/* Top bar */}
       <div className="px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -34,7 +34,6 @@ export default function DashboardNav({ shopName, onLogout }) {
         </div>
       </div>
 
-      {/* Tab Navigation */}
       <div className="max-w-2xl mx-auto px-4">
         <div className="flex gap-1">
           {links.map((link) => {

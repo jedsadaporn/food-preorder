@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import OrderCard from "@/components/OrderCard";
+import DashboardNav from "@/components/DashboardNav";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -161,7 +162,8 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ===== Navbar ===== */}
-      <div className="bg-gray-900 px-4 py-3">
+      <DashboardNav shopName={shop?.name} onLogout={handleLogout} />
+      {/* <div className="bg-gray-900 px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">🍳</span>
@@ -179,7 +181,7 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="max-w-2xl mx-auto px-4 py-4">
         {/* ===== Stats ===== */}

@@ -9,9 +9,17 @@ export default function MenuCard({ item, quantity, onAdd, onRemove }) {
           : "border-gray-100 hover:border-orange-200"
       }`}
     >
-      {/* รูปอาหาร (placeholder) */}
-      <div className="w-20 h-20 bg-gradient-to-br from-orange-100 to-amber-50 rounded-xl flex items-center justify-center shrink-0">
-        <span className="text-3xl">🍲</span>
+      {/* รูปอาหาร */}
+      <div className="w-20 h-20 bg-gradient-to-br from-orange-100 to-amber-50 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+        {item.image_url ? (
+          <img
+            src={item.image_url}
+            alt={item.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span className="text-3xl">🍲</span>
+        )}
       </div>
 
       {/* ข้อมูลเมนู */}
@@ -28,7 +36,6 @@ export default function MenuCard({ item, quantity, onAdd, onRemove }) {
             ฿{item.price.toLocaleString()}
           </p>
 
-          {/* ปุ่มเพิ่ม/ลด */}
           {quantity === 0 ? (
             <button
               onClick={onAdd}

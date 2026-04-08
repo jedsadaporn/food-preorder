@@ -9,6 +9,7 @@ export default function DashboardNav({ shopName, onLogout }) {
   const links = [
     { href: "/dashboard", label: "📋 ออเดอร์", key: "orders" },
     { href: "/dashboard/menu", label: "🍳 เมนู", key: "menu" },
+    { href: "/dashboard/qrcode", label: "📱 QR", key: "qrcode" },
     { href: "/dashboard/settings", label: "⚙️ ตั้งค่า", key: "settings" },
   ];
 

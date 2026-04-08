@@ -48,6 +48,7 @@ export async function notifyNewOrder(userId, order, items) {
   const pickupTime = new Date(order.pickup_time).toLocaleTimeString("th-TH", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Asia/Bangkok",
   });
 
   const itemList = items

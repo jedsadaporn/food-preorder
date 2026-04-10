@@ -98,6 +98,11 @@ export default function DashboardPage() {
       .from("orders")
       .update(updateData)
       .eq("id", orderId);
+
+    // refetch ทันทีหลังอัปเดต ไม่ต้องรอ realtime
+    if (shop) {
+      await fetchOrders(shop.id);
+    }
   };
 
   const handleLogout = async () => {
